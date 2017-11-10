@@ -9,7 +9,17 @@ defmodule Queue do
   end
 
   def close(connection) do
-    AMQP.Connection.close(connection) 
+    AMQP.Connection.close(connection)
+  end
+
+  def publish(channel, obj) do
+    msg = Poison.encode!(obj)
+    AMQP.Basic.publish(channel, "", "", msg, [
+      content_type: "application/json",
+      mandatory: true,
+      persistent: false,
+      priority: 0
+      ])
   end
 
 end
