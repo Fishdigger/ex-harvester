@@ -1,5 +1,14 @@
 defmodule Models.Job do
   @derive [Poison.Encoder, Poison.Decoder]
+
+  defmodule ExtraElement do
+    @derive [Poison.Encoder, Poison.Decoder]
+    defstruct [
+      :Key,
+      :Value
+    ]
+  end
+
   defstruct [
     :Name,
     :Status,
@@ -11,11 +20,4 @@ defmodule Models.Job do
     :ExtraElements
   ]
 
-  defmodule ExtraElement do
-    @derive [Poison.Encoder, Poison.Decoder]
-    defstruct [
-      :Key,
-      :Value
-    ]
-  end
 end

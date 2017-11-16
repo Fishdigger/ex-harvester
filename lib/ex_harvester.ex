@@ -6,7 +6,7 @@ defmodule ExHarvester do
      titles = Poison.decode!(body, as: [%Models.Title{credits: [%Models.Title.Credit{}]}])
      IO.puts("#{Enum.count(titles)} titles found")
      Enum.each(titles, fn(t) ->
-       IO.puts t.title
+       IO.puts("#{t.title} [#{Enum.join(t.akaNames, ", ")}]")
      end)
   end
 

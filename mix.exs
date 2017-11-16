@@ -17,7 +17,8 @@ defmodule ExHarvester.Mixfile do
       extra_applications: [:logger],
       applications: [
         :httpotion,
-        :amqp
+        :amqp,
+        :timex
       ]
     ]
   end
@@ -30,7 +31,8 @@ defmodule ExHarvester.Mixfile do
       {:httpotion, "~>3.0"},
       {:poison, "~>3.1"},
       {:plug, "~> 1.4"},
-      {:amqp, "~> 1.0.0-pre.2"}
+      {:amqp, "~> 1.0.0-pre.2"},
+      {:timex, "~> 3.1"}
     ]
   end
 end
