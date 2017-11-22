@@ -1,9 +1,11 @@
 defmodule Job do
 
   def get(job_name) do
-    build_route(job_name)
-    |> HttpClient.get
-    |> Poison.decode!(as: [%Models.Job{ExtraElements: [%Models.Job.ExtraElement{}]}])
+    url = build_route(job_name)
+    case HttpClient.get(url) do
+      {:ok, body} -> {:ok, Poison.decode!(body as: [%Models.Job{ExtraElements: [%Models.Job.ExtraElement{}]}])}
+      {:error, _} -> :error
+    end
   end
 
   def build_route(job_name) do
@@ -20,27 +22,25 @@ defmodule Job do
     get(Config.job_name)
   end
 
-
-  def start_next(job = %Models.Job{}) do
+  def start_next() do
     %Models.Job{
       Name: "DataCityHarvester-Custodian",
       LastJobStartDateTime: Timex.now
     }
   end
 
-  def copy_sync_time(previous_job = %Models.Job{ExtraElements: [%Models.Job.ExtraElement{}]}, current_job = %Models.Job{}) do
-    element = %Models.Job.ExtraElement{Key: "nextWindowStart", Value: get_next_window_start(previous_job)}
-    Enum.into(element, curent_job.ExtraElements)
+  def copy_sync_time(%Models.Job{} = previous) do
+    %Models.Job.ExtraElement{Key: "nextWindowStart", Value: get_next_window_start(previous)}
   end
 
-  def get_next_window_start(job = %Job{ExtraElements: [%Models.Job.ExtraElement{}]}) do
-    Enum.find(job.ExtraElements, job.LastJobStartDateTime, fn(e) ->
+  def get_next_window_start(%Job{ExtraElements: [%Models.Job.ExtraElement{}] = eles} = job) do
+    Enum.find(eles, job.LastJobStartDateTime, fn(e) ->
       e.Key == "nextWindowStart"
     end)
   end
 
-  def timed_out(job = %Models.Job{ExtraElements: [%Models.Job.ExtraElement{}]}) do
-    key = Enum.find(job.ExtraElements, fn(e) ->
+  def timed_out(%Models.Job{ExtraElements: [%Models.Job.ExtraElement{}] = eles}) do
+    key = Enum.find(eles, fn(e) ->
       e.Key == "timeout"
     end)
     ret = false
@@ -48,6 +48,16 @@ defmodule Job do
        ret = true
     end
     ret
+  end
+
+  def calculate_timeout(num_records) do
+    if num_records > 0 do
+      Timex.now
+      |> Timex.shift(seconds: num_records)
+    else
+      Timex.now
+      |> Timex.shift(minutes: 15)
+    end
   end
 
 end

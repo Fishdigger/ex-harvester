@@ -1,8 +1,8 @@
 defmodule HttpClient do
   def get(url) when is_bitstring(url) do
-    response = HTTPotion.get(url)
-    if response.status_code == 200 do
-      response.body
+    case HTTPotion.get(url) do
+       {:ok, response} -> {:ok, response.body}
+       {:error, _} -> {:error, "Could not fetch from URL: #{url}"}
     end
   end
 

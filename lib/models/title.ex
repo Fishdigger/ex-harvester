@@ -14,6 +14,7 @@ defmodule Models.Title do
     :directorBio,
     :language,
     :shortStoryline,
+    :storyline,
     :genres,
     :keywords,
     :countryOfOrigin,
