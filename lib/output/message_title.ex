@@ -45,7 +45,7 @@ defmodule Output.MessageTitle do
   def build_participants(%Models.Title{credits: [%Models.Title.Credit{}] = credits, director: dir, directorBio: bio}) do
     Enum.map credits, fn(credit) ->
       if credit.role == "Director" and credit.name == dir do
-        %Models.MessageTitle.Participant{Name: credit.name, RoleType: credit.role, Bio: bio, ParticpantType: "Person"}
+        %Models.MessageTitle.Participant{Name: credit.name, RoleType: credit.role, Bio: bio, ParticipantType: "Person"}
       else
         %Models.MessageTitle.Participant{Name: credit.name, RoleType: credit.role, ParticipantType: "Person"}
       end

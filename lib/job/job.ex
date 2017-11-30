@@ -3,8 +3,8 @@ defmodule Job do
   def get(job_name) do
     url = build_route(job_name)
     case HttpClient.get(url) do
-      {:ok, body} -> {:ok, Poison.decode!(body as: [%Models.Job{ExtraElements: [%Models.Job.ExtraElement{}]}])}
-      {:error, _} -> :error
+      {:ok, body} -> {:ok, Poison.decode!(body, as: [%Models.Job{ExtraElements: [%Models.Job.ExtraElement{}]}])}
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -33,21 +33,20 @@ defmodule Job do
     %Models.Job.ExtraElement{Key: "nextWindowStart", Value: get_next_window_start(previous)}
   end
 
-  def get_next_window_start(%Job{ExtraElements: [%Models.Job.ExtraElement{}] = eles} = job) do
-    Enum.find(eles, job.LastJobStartDateTime, fn(e) ->
-      e.Key == "nextWindowStart"
+  def get_next_window_start(%Models.Job{LastJobStartDateTime: start_date_time, ExtraElements: [%Models.Job.ExtraElement{}] = eles}) do
+    Enum.find(eles, start_date_time, fn(%Models.Job.ExtraElement{Key: key}) ->
+      key == "nextWindowStart"
     end)
   end
 
   def timed_out(%Models.Job{ExtraElements: [%Models.Job.ExtraElement{}] = eles}) do
-    key = Enum.find(eles, fn(e) ->
-      e.Key == "timeout"
+    key = Enum.find(eles, fn(%Models.Job.ExtraElement{Key: key}) ->
+      key == "timeout"
     end)
-    ret = false
-    if Timex.after?(Timex.now, key) do
-       ret = true
+    case Timex.after?(Timex.now, key) do
+      {:error, _} -> true
+      bool -> bool
     end
-    ret
   end
 
   def calculate_timeout(num_records) do
